@@ -9,7 +9,7 @@ namespace Dash
 {
     public static class DashTweenExtensions
     {
-        static public bool DoNullChecks = false;
+        public static bool DoNullChecks = false;
         
         public static DashTween DashLocalRotate(this Transform p_transform, Vector3 p_rotation, float p_time, bool p_useSpeed = false)
         {
@@ -84,6 +84,35 @@ namespace Dash
                     
                     p_graphic.color = tween.relative ? original + c : c;
                 }).Start();
+            return tween;
+        }
+        
+        public static DashTween DashAnchoredPosition(this RectTransform p_rectTransform,
+            Vector2 p_finalPosition,
+            float p_duration,
+            EaseType p_easeType = EaseType.LINEAR,
+            float p_delay = 0f)
+        {
+            var original = p_rectTransform.anchoredPosition;
+            var tween = DashTween.To(p_rectTransform, 0f, 1f, p_duration);
+
+            if (p_delay >= 0f)
+            {
+                tween.SetDelay(p_delay);
+            }
+
+            tween.OnInternalUpdate(delta =>
+            {
+                if (DoNullChecks && p_rectTransform == null)
+                {
+                    return;
+                }
+
+                p_rectTransform.anchoredPosition = new Vector2(
+                    DashTween.EaseValue(original.x, p_finalPosition.x, delta, p_easeType),
+                    DashTween.EaseValue(original.y, p_finalPosition.y, delta, p_easeType));
+            });
+            tween.Start();
             return tween;
         }
     }
