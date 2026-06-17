@@ -115,5 +115,90 @@ namespace Dash
             tween.Start();
             return tween;
         }
+
+		public static DashTween DashAnchoredPositionX(this RectTransform p_rectTransform,
+            float p_finalPosition,
+            float p_duration,
+            EaseType p_easeType = EaseType.LINEAR,
+            float p_delay = 0f)
+        {
+            var posY = p_rectTransform.anchoredPosition.y;
+            return p_rectTransform.TEST_DashAnchoredPosition(new Vector2(p_finalPosition, posY),
+                p_duration,
+                p_easeType,
+                p_delay);
+        }
+
+        public static DashTween DashAnchoredPositionY(this RectTransform p_rectTransform,
+            float p_finalPosition,
+            float p_duration,
+            EaseType p_easeType = EaseType.LINEAR,
+            float p_delay = 0f)
+        {
+            var posX = p_rectTransform.anchoredPosition.x;
+            return p_rectTransform.TEST_DashAnchoredPosition(new Vector2(posX, p_finalPosition),
+                p_duration,
+                p_easeType,
+                p_delay);
+        }
+
+        public static DashTween DashSizeDelta(this RectTransform p_rectTransform,
+            Vector2 p_finalSize,
+            float p_duration,
+            EaseType p_easeType = EaseType.LINEAR,
+            float p_delay = 0f)
+        {
+            var original = p_rectTransform.sizeDelta;
+            var tween = DashTween.To(p_rectTransform, 0f, 1f, p_duration);
+
+            if (p_delay >= 0f)
+            {
+                tween.SetDelay(p_delay);
+            }
+
+            tween.OnInternalUpdate(delta =>
+            {
+                if (DoNullChecks && p_rectTransform == null)
+                {
+                    return;
+                }
+
+                p_rectTransform.sizeDelta = new Vector2(
+                    DashTween.EaseValue(original.x, p_finalSize.x, delta, p_easeType),
+                    DashTween.EaseValue(original.y, p_finalSize.y, delta, p_easeType));
+            });
+            tween.Start();
+            return tween;
+        }
+
+        public static DashTween DashScale(this RectTransform p_rectTransform,
+            Vector2 p_finalScale,
+            float p_duration,
+            EaseType p_easeType = EaseType.LINEAR,
+            float p_delay = 0f)
+        {
+            var original = p_rectTransform.localScale;
+            var tween = DashTween.To(p_rectTransform, 0f, 1f, p_duration);
+
+            if (p_delay >= 0f)
+            {
+                tween.SetDelay(p_delay);
+            }
+
+            tween.OnInternalUpdate(delta =>
+            {
+                if (DoNullChecks && p_rectTransform == null)
+                {
+                    return;
+                }
+
+                p_rectTransform.localScale = new Vector3(
+                    DashTween.EaseValue(original.x, p_finalScale.x, delta, p_easeType),
+                    DashTween.EaseValue(original.y, p_finalScale.y, delta, p_easeType),
+                    1f);
+            });
+            tween.Start();
+            return tween;
+        }
     }
 }
